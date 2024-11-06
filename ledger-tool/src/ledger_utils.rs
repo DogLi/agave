@@ -126,6 +126,7 @@ pub fn load_and_process_ledger(
     snapshot_archive_path: Option<PathBuf>,
     incremental_snapshot_archive_path: Option<PathBuf>,
 ) -> Result<(Arc<RwLock<BankForks>>, Option<StartingSnapshotHashes>), LoadAndProcessLedgerError> {
+    info!("xxxxxxxxxx: load and process leader...");
     let bank_snapshots_dir = if blockstore.is_primary_access() {
         blockstore.ledger_path().join("snapshot")
     } else {
@@ -162,6 +163,7 @@ pub fn load_and_process_ledger(
             ..SnapshotConfig::new_load_only()
         })
     };
+    info!("xxxxxxxxxx: load and process leader, process 1.halt_at_slot ...");
 
     match process_options.halt_at_slot {
         // Skip the following checks for sentinel values of Some(0) and None.
@@ -189,6 +191,7 @@ pub fn load_and_process_ledger(
         }
     }
 
+    info!("xxxxxxxxxx: load and process leader, process 2.account_paths ...");
     let account_paths = if let Some(account_paths) = arg_matches.value_of("account_paths") {
         // If this blockstore access is Primary, no other process (agave-validator) can hold
         // Primary access. So, allow a custom accounts path without worry of wiping the accounts
@@ -251,11 +254,13 @@ pub fn load_and_process_ledger(
         .map_err(LoadAndProcessLedgerError::CleanOrphanedAccountSnapshotDirectories)?;
 
     let geyser_plugin_active = arg_matches.is_present("geyser_plugin_config");
+    info!("xxxxxxxxxx: load and process leader, process 3.geyser_plugin_active ...");
     let (accounts_update_notifier, transaction_notifier) = if geyser_plugin_active {
         let geyser_config_files = values_t_or_exit!(arg_matches, "geyser_plugin_config", String)
             .into_iter()
             .map(PathBuf::from)
             .collect::<Vec<_>>();
+        info!("xxxxxxxxxx: load and process leader, process 3.geyser_plugin_active, geyser config files: {geyser_config_files:?} ...");
 
         let (confirmed_bank_sender, confirmed_bank_receiver) = unbounded();
         drop(confirmed_bank_sender);
