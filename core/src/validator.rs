@@ -515,6 +515,7 @@ impl Validator {
 
         let geyser_plugin_service =
             if let Some(geyser_plugin_config_files) = &config.on_start_geyser_plugin_config_files {
+                info!("xxxxxxxx: start geyser plugin: {:?}", geyser_plugin_config_files);
                 let (confirmed_bank_sender, confirmed_bank_receiver) = unbounded();
                 bank_notification_senders.push(confirmed_bank_sender);
                 let rpc_to_plugin_manager_receiver_and_exit =
@@ -525,9 +526,10 @@ impl Validator {
                         geyser_plugin_config_files,
                         rpc_to_plugin_manager_receiver_and_exit,
                     )
-                    .map_err(|err| format!("Failed to load the Geyser plugin: {err:?}"))?,
+                    .map_err(|err| format!("xxxxxxxxx Failed to load the Geyser plugin: {err:?}"))?,
                 )
             } else {
+                info!("xxxxxxx: no geyser plugin in config");
                 None
             };
 
